@@ -2,13 +2,11 @@ import streamlit as st
 from datetime import date, datetime
 import streamlit.components.v1 as components
 
-
 st.set_page_config(
     page_title="TEDx GGSIPU EDC | Invitation Generator",
     page_icon="🔴",
     layout="centered"
 )
-
 
 def get_date_suffix(day: int) -> str:
     if 11 <= day <= 13:
@@ -21,7 +19,10 @@ def format_ordinal_date(selected_date):
     suffix = get_date_suffix(day)
     return dt.strftime(f"{day}{suffix} %B, %Y")
 
-def generate_html(template_content, speaker_name, why_you, reply_date):
+def generate_html(speaker_name, why_you, reply_date):
+    with open("template.html", "r", encoding="utf-8") as f:
+        template_content = f.read()
+
     formatted_date = format_ordinal_date(reply_date)
 
     final_html = template_content.replace("{{SpeakerName}}", speaker_name)
@@ -38,46 +39,25 @@ st.image(
 st.title("Invitation Generator")
 st.markdown("Generate personalised TEDx invitations for your guest speakers.")
 
-with st.container():
-    st.subheader("Speaker Details")
+speaker_name = st.text_input("Speaker Name", placeholder="e.g. Dr. Satya Nadella")
 
-    uploaded_file = st.file_uploader("Upload HTML Template", type=["html"])
+why_you = st.text_area(
+    "Why You Section",
+    placeholder="Describe why this speaker is perfect for SANGAM..."
+)
 
-    speaker_name = st.text_input(
-        "Speaker Name",
-        placeholder="e.g. Dr. Satya Nadella"
-    )
+reply_date = st.date_input(
+    "Reply By Date",
+    value=date(2026, 3, 1)
+)
 
-    why_you = st.text_area(
-        "Why You Section",
-        placeholder="Describe why this speaker is perfect for SANGAM..."
-    )
-
-    reply_date = st.date_input(
-        "Reply By Date",
-        value=date(2026, 3, 1)
-    )
-
-    generate_btn = st.button("🚀 Generate Invitation", use_container_width=True)
-
-# -------------------------------
-# Generate Logic
-# -------------------------------
-
-if generate_btn:
-
-    if not uploaded_file:
-        st.error("Please upload the HTML template.")
-        st.stop()
+if st.button("🚀 Generate Invitation", use_container_width=True):
 
     if not speaker_name or not why_you:
         st.error("Please fill in all fields.")
         st.stop()
 
-    template_content = uploaded_file.read().decode("utf-8")
-
     generated_html = generate_html(
-        template_content,
         speaker_name,
         why_you,
         reply_date
