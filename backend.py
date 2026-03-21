@@ -12,6 +12,7 @@ class InvitationRequest(BaseModel):
     speaker_name: str = Field(..., example="Jane Doe")
     why_you: str = Field(..., example="Your expertise in AI ethics is unparalleled.")
     reply_date: str = Field(..., example="2026-03-01")
+    event_date: str = Field("2026-04-16", example="2026-04-16")
 
 # --- Utilities ---
 
@@ -52,11 +53,13 @@ async def generate_invitation(payload: InvitationRequest):
 
         # 2. Format the date
         formatted_date = format_ordinal_date(payload.reply_date)
+        formatted_event_date = format_ordinal_date(payload.event_date)
 
         # 3. Perform replacements
         final_html = template_content.replace("{{SpeakerName}}", payload.speaker_name)
         final_html = final_html.replace("{{WhyYouContent}}", payload.why_you)
         final_html = final_html.replace("{{ReplyDate}}", formatted_date)
+        final_html = final_html.replace("{{EventDate}}", formatted_event_date)
 
         return final_html
 

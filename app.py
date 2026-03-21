@@ -30,16 +30,18 @@ def format_paragraphs(text: str) -> str:
         formatted += f"<p>{para}</p>\n"
     return formatted
 
-def generate_html(speaker_name, why_you, reply_date):
+def generate_html(speaker_name, why_you, reply_date, event_date):
     with open("template.html", "r", encoding="utf-8") as f:
         template_content = f.read()
 
     formatted_date = format_ordinal_date(reply_date)
+    formatted_event_date = format_ordinal_date(event_date)
     formatted_why_you = format_paragraphs(why_you)
 
     final_html = template_content.replace("{{SpeakerName}}", speaker_name)
     final_html = final_html.replace("{{WhyYouContent}}", formatted_why_you)
     final_html = final_html.replace("{{ReplyDate}}", formatted_date)
+    final_html = final_html.replace("{{EventDate}}", formatted_event_date)
 
     return final_html
 
@@ -67,6 +69,11 @@ reply_date = st.date_input(
     value=date(2026, 3, 1)
 )
 
+event_date = st.date_input(
+    "Date of Event",
+    value=date(2026, 4, 16)
+)
+
 if st.button("🚀 Generate Invitation", use_container_width=True):
 
     if not speaker_name.strip() or not why_you.strip():
@@ -76,7 +83,8 @@ if st.button("🚀 Generate Invitation", use_container_width=True):
     generated_html = generate_html(
         speaker_name.strip(),
         why_you.strip(),
-        reply_date
+        reply_date,
+        event_date
     )
 
     st.success("Invitation generated successfully!")
